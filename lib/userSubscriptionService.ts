@@ -103,7 +103,7 @@ export const PACKAGES: Record<string, PackageDetails> = {
     limits: { contacts: 200 }
   },
   humsafar_select: {
-    name: 'Hamsafar Select',
+    name: 'humsafar Select',
     price: 50000,
     duration_months: 0, // Custom duration
     features: [

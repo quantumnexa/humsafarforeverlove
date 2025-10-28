@@ -420,7 +420,7 @@ export default function Header() {
     </div>
   </div>
 ) : (
-  <div className="bg-red-500 text-white overflow-hidden relative">
+  <div className="bg-humsafar-500 text-white overflow-hidden relative">
     <div className="container mx-auto px-4 py-2">
       <div className="whitespace-nowrap animate-marquee">
         Limited Time Offer: 50% Discount on all Packages

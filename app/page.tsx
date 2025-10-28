@@ -153,7 +153,7 @@ export default function HomePage() {
     {
       id: 3,
       title: "Success Stories That Inspire",
-      subtitle: "Over 50,000 happy couples found their soulmate through Hamsafar",
+      subtitle: "Over 50,000 happy couples found their soulmate through humsafar",
       image: "/wedding-couple-hero-3.jpg",
       cta: "Read Stories",
     },
@@ -195,7 +195,7 @@ export default function HomePage() {
       names: "Ahmed & Fatima",
       location: "Karachi",
       story:
-        "We found each other through Hamsafar and couldn't be happier. The platform made it so easy to connect with like-minded people.",
+        "We found each other through humsafar and couldn't be happier. The platform made it so easy to connect with like-minded people.",
       image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=300&fit=crop&crop=faces",
       date: "Married in 2023",
     },
@@ -203,7 +203,7 @@ export default function HomePage() {
       id: 2,
       names: "Hassan & Ayesha",
       location: "Lahore",
-      story: "After months of searching, we found our perfect match. Hamsafar's matching algorithm really works!",
+      story: "After months of searching, we found our perfect match. humsafar's matching algorithm really works!",
       image: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=400&h=300&fit=crop&crop=faces",
       date: "Married in 2024",
     },
@@ -211,7 +211,7 @@ export default function HomePage() {
       id: 3,
       names: "Ali & Zara",
       location: "Islamabad",
-      story: "From the first conversation to our wedding day, everything felt perfect. Thank you Hamsafar!",
+      story: "From the first conversation to our wedding day, everything felt perfect. Thank you humsafar!",
       image: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&h=300&fit=crop&crop=faces",
       date: "Married in 2024",
     },
@@ -930,7 +930,7 @@ export default function HomePage() {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in-up">Why Choose Hamsafar?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in-up">Why Choose humsafar?</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '0.2s'}}>Pakistan's most trusted matrimonial platform with cutting-edge features</p>
           </div>
 
