@@ -32,6 +32,7 @@ import { ProfileViewService } from "@/lib/profileViewService"
 import CustomAlert from "@/components/ui/custom-alert"
 import { useCustomAlert } from "@/hooks/use-custom-alert"
 import ProtectedImage from "@/components/ui/protected-image"
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel"
 
 // Helper function to capitalize text
 const capitalizeText = (text: string | null | undefined): string => {
@@ -747,166 +748,262 @@ export default function HomePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Profiles</h2>
             <p className="text-xl text-gray-600">Discover verified profiles of potential life partners</p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {loadingFeatured && (
-              <div className="col-span-full flex flex-col items-center justify-center py-12">
-                {/* Compact Spinning Loader */}
-                <div className="relative mb-4">
-                  <div className="w-12 h-12 border-4 border-humsafar-100 border-t-humsafar-600 rounded-full animate-spin"></div>
-                  <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-t-humsafar-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-                </div>
-                
-                {/* Loading Text */}
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-gray-700 mb-1">Loading Profiles</h3>
-                  <p className="text-sm text-gray-500">Please wait...</p>
-                </div>
-                
-                {/* Loading Dots Animation */}
-                <div className="flex space-x-1 mt-3">
-                  <div className="w-1.5 h-1.5 bg-humsafar-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-humsafar-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-humsafar-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                </div>
+          {/* Loading & Empty states */}
+          {loadingFeatured && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="relative mb-4">
+                <div className="w-12 h-12 border-4 border-humsafar-100 border-t-humsafar-600 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-t-humsafar-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
               </div>
-            )}
-            {!loadingFeatured && featuredProfiles.length === 0 && (
-              <div className="text-center text-gray-600 col-span-full py-8">
-                <p className="text-lg mb-2">No verified profiles to display at the moment.</p>
-               
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-700 mb-1">Loading Profiles</h3>
+                <p className="text-sm text-gray-500">Please wait...</p>
               </div>
-            )}
-            {featuredProfiles.map((profile) => {
-              // Debug: Log profile image data
-              console.log(`🏠 HOMEPAGE: Profile ${profile.id} image data:`, {
-                mainImage: profile.mainImage,
-                hasMainImage: !!profile.mainImage,
-                imageUrl: profile.mainImage,
-                profileId: profile.id,
-                userId: profile.id
-              })
-              
-              // Build full name including middle name and capitalize properly
-              let name = 'Unnamed'
-              if (profile.first_name || profile.last_name) {
-                const nameParts = [profile.first_name, profile.last_name].filter(Boolean)
-                name = nameParts.map(part => capitalizeText(part)).join(' ')
-              } else if (profile.display_name) {
-                name = capitalizeText(profile.display_name)
-              } else if (profile.username) {
-                name = capitalizeText(profile.username)
-              }
-              
-              // Combine education + field of study
-              let edu = 'Education not specified'
-              if (profile.education && profile.field_of_study) {
-                edu = `${capitalizeText(profile.education)} in ${capitalizeText(profile.field_of_study)}`
-              } else if (profile.education) {
-                edu = capitalizeText(profile.education)
-              } else if (profile.degree) {
-                edu = capitalizeText(profile.degree)
-              } else if (profile.qualification) {
-                edu = capitalizeText(profile.qualification)
-              }
-              
-              const city = capitalizeText(profile.city || profile.location || profile.current_city || 'Location not specified')
+              <div className="flex space-x-1 mt-3">
+                <div className="w-1.5 h-1.5 bg-humsafar-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-humsafar-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-humsafar-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          )}
+          {!loadingFeatured && featuredProfiles.length === 0 && (
+            <div className="text-center text-gray-600 py-8">
+              <p className="text-lg mb-2">No verified profiles to display at the moment.</p>
+            </div>
+          )}
 
-              return (
-                <Card
-                  key={profile.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow border-humsafar-100 group flex flex-col h-full min-h-[400px]"
-                >
-                  <div className="relative">
-                    {profile.mainImage && profile.mainImage !== '/placeholder.jpg' ? (
-                    <ProtectedImage
-                      src={profile.mainImage}
-                      alt={name}
-                      width={400}
-                      height={400}
-                      className="w-full h-80 object-contain object-top group-hover:scale-105 transition-transform duration-300 bg-black"
-                      onError={(e) => {
-                        // Fallback to placeholder if image fails to load
-                        const target = e.target as HTMLImageElement
-                          console.log(`🏠 HOMEPAGE: Image failed to load for profile ${profile.id}:`, profile.mainImage)
-                        target.src = '/placeholder.jpg'
-                      }}
-                        onLoad={() => {
-                          console.log(`🏠 HOMEPAGE: Image loaded successfully for profile ${profile.id}:`, profile.mainImage)
+          {/* Mobile-only Carousel */}
+          {!loadingFeatured && featuredProfiles.length > 0 && (
+            <div className="md:hidden mb-12">
+              <Carousel opts={{ align: 'start', loop: false }}>
+                <CarouselContent>
+                  {featuredProfiles.map((profile) => {
+                    let name = 'Unnamed'
+                    if (profile.first_name || profile.last_name) {
+                      const nameParts = [profile.first_name, profile.last_name].filter(Boolean)
+                      name = nameParts.map(part => capitalizeText(part)).join(' ')
+                    } else if (profile.display_name) {
+                      name = capitalizeText(profile.display_name)
+                    } else if (profile.username) {
+                      name = capitalizeText(profile.username)
+                    }
+
+                    let edu = 'Education not specified'
+                    if (profile.education && profile.field_of_study) {
+                      edu = `${capitalizeText(profile.education)} in ${capitalizeText(profile.field_of_study)}`
+                    } else if (profile.education) {
+                      edu = capitalizeText(profile.education)
+                    } else if (profile.degree) {
+                      edu = capitalizeText(profile.degree)
+                    } else if (profile.qualification) {
+                      edu = capitalizeText(profile.qualification)
+                    }
+                    const city = capitalizeText(profile.city || profile.location || profile.current_city || 'Location not specified')
+
+                    return (
+                      <CarouselItem key={profile.id} className="basis-[85%]">
+                        <Card className="overflow-hidden hover:shadow-lg transition-shadow border-humsafar-100 group flex flex-col h-full min-h-[400px]">
+                          <div className="relative">
+                            {profile.mainImage && profile.mainImage !== '/placeholder.jpg' ? (
+                              <ProtectedImage
+                                src={profile.mainImage}
+                                alt={name}
+                                width={400}
+                                height={400}
+                                className="w-full h-80 object-contain object-top transition-transform duration-300 bg-black"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.src = '/placeholder.jpg'
+                                }}
+                                priority={true}
+                              />
+                            ) : (
+                              <div className="w-full h-80 bg-gray-100 flex items-center justify-center transition-transform duration-300">
+                                <div className="text-center text-gray-400">
+                                  <User className="w-12 h-12 mx-auto mb-2" />
+                                  <p className="text-sm">No Photo</p>
+                                </div>
+                              </div>
+                            )}
+                            {profile.premium && <Badge className="absolute top-3 left-3 bg-humsafar-600 text-xs">Premium</Badge>}
+                          </div>
+                          <CardContent className="p-4 flex flex-col h-full">
+                            <div className="mb-3 flex-grow">
+                              <div className="text-center mb-3">
+                                <span className="inline-block bg-humsafar-100 text-humsafar-800 px-4 py-2 rounded-full text-lg font-bold">
+                                  {profile.id.substring(0, 8).toUpperCase()}
+                                </span>
+                              </div>
+                              <div className="space-y-1 mb-3 text-gray-600 text-sm">
+                                {profile.age && (
+                                  <div className="flex items-center">
+                                    <span className="text-gray-700 text-sm font-medium w-20 mr-2">Age:</span>
+                                    <Calendar className="w-3 h-3 text-humsafar-500 mr-2" />
+                                    <span className="text-gray-600 text-sm">{profile.age} years</span>
+                                  </div>
+                                )}
+                                <div className="flex items-center">
+                                  <span className="text-gray-700 text-sm font-medium w-20 mr-2">Education:</span>
+                                  <GraduationCap className="w-3 h-3 text-humsafar-500 mr-2" />
+                                  <span className="text-gray-600 text-sm truncate">{edu}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <span className="text-gray-700 text-sm font-medium w-20 mr-2">Location:</span>
+                                  <MapPin className="w-3 h-3 text-humsafar-500 mr-2" />
+                                  <span className="text-gray-600 text-sm">{city}</span>
+                                </div>
+                                {profile.religion && (
+                                  <div className="flex items-center">
+                                    <span className="text-gray-700 text-sm font-medium w-20 mr-2">Religion:</span>
+                                    <User className="w-3 h-3 text-humsafar-500 mr-2" />
+                                    <span className="text-gray-600 text-sm">{capitalizeText(profile.religion)}</span>
+                                  </div>
+                                )}
+                                {profile.marital_status && (
+                                  <div className="flex items-center">
+                                    <span className="text-gray-700 text-sm font-medium w-20 mr-2">Status:</span>
+                                    <Heart className="w-3 h-3 text-humsafar-500 mr-2" />
+                                    <span className="text-gray-600 text-sm">{capitalizeText(profile.marital_status)}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex gap-2 mt-auto">
+                              <Button 
+                                onClick={() => handleViewProfile(profile.id)}
+                                className={`w-full text-sm py-2 ${
+                                  viewedProfileIds.has(profile.id)
+                                    ? 'bg-gray-500 hover:bg-gray-600 text-white'
+                                    : 'bg-humsafar-600 hover:bg-humsafar-700 text-white'
+                                }`}
+                              >
+                                {viewedProfileIds.has(profile.id) ? 'View Again' : 'View Profile'}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    )
+                  })}
+                </CarouselContent>
+              </Carousel>
+            </div>
+          )}
+
+          {/* Desktop/tablet Grid */}
+          {!loadingFeatured && featuredProfiles.length > 0 && (
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {featuredProfiles.map((profile) => {
+                let name = 'Unnamed'
+                if (profile.first_name || profile.last_name) {
+                  const nameParts = [profile.first_name, profile.last_name].filter(Boolean)
+                  name = nameParts.map(part => capitalizeText(part)).join(' ')
+                } else if (profile.display_name) {
+                  name = capitalizeText(profile.display_name)
+                } else if (profile.username) {
+                  name = capitalizeText(profile.username)
+                }
+
+                let edu = 'Education not specified'
+                if (profile.education && profile.field_of_study) {
+                  edu = `${capitalizeText(profile.education)} in ${capitalizeText(profile.field_of_study)}`
+                } else if (profile.education) {
+                  edu = capitalizeText(profile.education)
+                } else if (profile.degree) {
+                  edu = capitalizeText(profile.degree)
+                } else if (profile.qualification) {
+                  edu = capitalizeText(profile.qualification)
+                }
+                const city = capitalizeText(profile.city || profile.location || profile.current_city || 'Location not specified')
+
+                return (
+                  <Card
+                    key={profile.id}
+                    className="overflow-hidden hover:shadow-lg transition-shadow border-humsafar-100 group flex flex-col h-full min-h-[400px]"
+                  >
+                    <div className="relative">
+                      {profile.mainImage && profile.mainImage !== '/placeholder.jpg' ? (
+                      <ProtectedImage
+                        src={profile.mainImage}
+                        alt={name}
+                        width={400}
+                        height={400}
+                        className="w-full h-80 object-contain object-top transition-transform duration-300 bg-black"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.src = '/placeholder.jpg'
                         }}
                         priority={true}
-                      />
-                    ) : (
-                      <div className="w-full h-80 bg-gray-100 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                        <div className="text-center text-gray-400">
-                          <User className="w-12 h-12 mx-auto mb-2" />
-                          <p className="text-sm">No Photo</p>
-                        </div>
-                      </div>
-                    )}
-                    {profile.premium && <Badge className="absolute top-3 left-3 bg-humsafar-600 text-xs">Premium</Badge>}
-
-                  </div>
-                  <CardContent className="p-4 flex flex-col h-full">
-                    <div className="mb-3 flex-grow">
-                      {/* User ID Display */}
-                      <div className="text-center mb-3">
-                        <span className="inline-block bg-humsafar-100 text-humsafar-800 px-4 py-2 rounded-full text-lg font-bold">
-                          {profile.id.substring(0, 8).toUpperCase()}
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-1 mb-3 text-gray-600 text-sm">
-                        {profile.age && (
-                          <div className="flex items-center">
-                            <span className="text-gray-700 text-sm font-medium w-20 mr-2">Age:</span>
-                            <Calendar className="w-3 h-3 text-humsafar-500 mr-2" />
-                            <span className="text-gray-600 text-sm">{profile.age} years</span>
+                        />
+                      ) : (
+                        <div className="w-full h-80 bg-gray-100 flex items-center justify-center transition-transform duration-300">
+                          <div className="text-center text-gray-400">
+                            <User className="w-12 h-12 mx-auto mb-2" />
+                            <p className="text-sm">No Photo</p>
                           </div>
-                        )}
-                        <div className="flex items-center">
-                          <span className="text-gray-700 text-sm font-medium w-20 mr-2">Education:</span>
-                          <GraduationCap className="w-3 h-3 text-humsafar-500 mr-2" />
-                          <span className="text-gray-600 text-sm truncate">{edu}</span>
                         </div>
-                        <div className="flex items-center">
-                          <span className="text-gray-700 text-sm font-medium w-20 mr-2">Location:</span>
-                          <MapPin className="w-3 h-3 text-humsafar-500 mr-2" />
-                          <span className="text-gray-600 text-sm">{city}</span>
-                        </div>
-                        {profile.religion && (
-                          <div className="flex items-center">
-                            <span className="text-gray-700 text-sm font-medium w-20 mr-2">Religion:</span>
-                            <User className="w-3 h-3 text-humsafar-500 mr-2" />
-                            <span className="text-gray-600 text-sm">{capitalizeText(profile.religion)}</span>
-                          </div>
-                        )}
-                        {profile.marital_status && (
-                          <div className="flex items-center">
-                            <span className="text-gray-700 text-sm font-medium w-20 mr-2">Status:</span>
-                            <Heart className="w-3 h-3 text-humsafar-500 mr-2" />
-                            <span className="text-gray-600 text-sm">{capitalizeText(profile.marital_status)}</span>
-                          </div>
-                        )}
-                      </div>
+                      )}
+                      {profile.premium && <Badge className="absolute top-3 left-3 bg-humsafar-600 text-xs">Premium</Badge>}
                     </div>
-
-                    <div className="flex gap-2 mt-auto">
-                      <Button 
-                        onClick={() => handleViewProfile(profile.id)}
-                        className={`w-full text-sm py-2 ${
-                          viewedProfileIds.has(profile.id)
-                            ? 'bg-gray-500 hover:bg-gray-600 text-white'
-                            : 'bg-humsafar-600 hover:bg-humsafar-700 text-white'
-                        }`}
-                      >
-                        {viewedProfileIds.has(profile.id) ? 'View Again' : 'View Profile'}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );})}
-          </div>
+                    <CardContent className="p-4 flex flex-col h-full">
+                      <div className="mb-3 flex-grow">
+                        <div className="text-center mb-3">
+                          <span className="inline-block bg-humsafar-100 text-humsafar-800 px-4 py-2 rounded-full text-lg font-bold">
+                            {profile.id.substring(0, 8).toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="space-y-1 mb-3 text-gray-600 text-sm">
+                          {profile.age && (
+                            <div className="flex items-center">
+                              <span className="text-gray-700 text-sm font-medium w-20 mr-2">Age:</span>
+                              <Calendar className="w-3 h-3 text-humsafar-500 mr-2" />
+                              <span className="text-gray-600 text-sm">{profile.age} years</span>
+                            </div>
+                          )}
+                          <div className="flex items-center">
+                            <span className="text-gray-700 text-sm font-medium w-20 mr-2">Education:</span>
+                            <GraduationCap className="w-3 h-3 text-humsafar-500 mr-2" />
+                            <span className="text-gray-600 text-sm truncate">{edu}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="text-gray-700 text-sm font-medium w-20 mr-2">Location:</span>
+                            <MapPin className="w-3 h-3 text-humsafar-500 mr-2" />
+                            <span className="text-gray-600 text-sm">{city}</span>
+                          </div>
+                          {profile.religion && (
+                            <div className="flex items-center">
+                              <span className="text-gray-700 text-sm font-medium w-20 mr-2">Religion:</span>
+                              <User className="w-3 h-3 text-humsafar-500 mr-2" />
+                              <span className="text-gray-600 text-sm">{capitalizeText(profile.religion)}</span>
+                            </div>
+                          )}
+                          {profile.marital_status && (
+                            <div className="flex items-center">
+                              <span className="text-gray-700 text-sm font-medium w-20 mr-2">Status:</span>
+                              <Heart className="w-3 h-3 text-humsafar-500 mr-2" />
+                              <span className="text-gray-600 text-sm">{capitalizeText(profile.marital_status)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-auto">
+                        <Button 
+                          onClick={() => handleViewProfile(profile.id)}
+                          className={`w-full text-sm py-2 ${
+                            viewedProfileIds.has(profile.id)
+                              ? 'bg-gray-500 hover:bg-gray-600 text-white'
+                              : 'bg-humsafar-600 hover:bg-humsafar-700 text-white'
+                          }`}
+                        >
+                          {viewedProfileIds.has(profile.id) ? 'View Again' : 'View Profile'}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
 
           <div className="text-center">
             <Link href="/profiles" legacyBehavior>

@@ -35,6 +35,7 @@ import { ViewedProfilesCart } from "@/components/viewed-profiles-cart"
 import CustomAlert from "@/components/ui/custom-alert"
 import { useCustomAlert } from "@/hooks/use-custom-alert"
 import ProtectedImage from "@/components/ui/protected-image"
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel"
 
 const capitalizeText = (text: string | null | undefined): string => {
   if (!text) return ""
@@ -750,28 +751,44 @@ export default function ProfilesListingPage() {
           </div>
         )}
 
-        {/* Profiles Grid */}
-        {!loading && (
-          <div className={`grid gap-6 ${
+        {/* Empty state */}
+        {!loading && currentProfiles.length === 0 && (
+          <div className="text-center py-12">
+            <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              No profiles found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your search criteria or filters
+            </p>
+          </div>
+        )}
+
+        {/* Mobile-only Carousel */}
+        {!loading && currentProfiles.length > 0 && (
+          <div className="md:hidden">
+            <Carousel opts={{ align: 'start', loop: false }}>
+              <CarouselContent>
+                {currentProfiles.map((profile) => (
+                  <CarouselItem key={profile.user_id || profile.id} className="basis-[85%]">
+                    <ProfileCard profile={profile} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          </div>
+        )}
+
+        {/* Desktop/tablet Grid */}
+        {!loading && currentProfiles.length > 0 && (
+          <div className={`hidden md:grid gap-6 ${
             viewMode === "grid" 
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
-              : "grid-cols-1"
+              ? "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+              : "md:grid-cols-1"
           }`}>
-            {currentProfiles.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                  No profiles found
-                </h3>
-                <p className="text-gray-500">
-                  Try adjusting your search criteria or filters
-                </p>
-              </div>
-            ) : (
-              currentProfiles.map((profile) => (
-                <ProfileCard key={profile.user_id || profile.id} profile={profile} />
-              ))
-            )}
+            {currentProfiles.map((profile) => (
+              <ProfileCard key={profile.user_id || profile.id} profile={profile} />
+            ))}
           </div>
         )}
 
