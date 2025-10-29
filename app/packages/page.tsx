@@ -85,7 +85,7 @@ export default function PackagesPage() {
         // Read current subscription
         const { data: sub } = await supabase
           .from("user_subscriptions")
-          .select("views_limit, subscription_status, payment_status")
+          .select("views_limit, subscription_status")
           .eq("user_id", user.id)
           .single()
 

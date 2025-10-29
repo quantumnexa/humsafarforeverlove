@@ -92,7 +92,7 @@ export async function POST(req: Request) {
         paymentStored = true
         const { data: subscription } = await supabase
           .from("user_subscriptions")
-          .select("user_id, views_limit, payment_status")
+          .select("user_id, views_limit")
           .eq("user_id", userId)
           .single()
 
@@ -102,7 +102,6 @@ export async function POST(req: Request) {
             .from("user_subscriptions")
             .update({
               views_limit: current + views,
-              payment_status: "approved",
               updated_at: new Date().toISOString(),
             })
             .eq("user_id", userId)
@@ -112,7 +111,6 @@ export async function POST(req: Request) {
           const { error: insErr } = await supabase.from("user_subscriptions").insert({
             user_id: userId,
             views_limit: views,
-            payment_status: "approved",
             subscription_status:
               package_type === "premium"
                 ? "Premium Package"
@@ -124,6 +122,19 @@ export async function POST(req: Request) {
           })
           if (!insErr) subscriptionUpdated = true
           else console.error("[PayFast] Subscription insert failed:", insErr)
+        }
+
+        // 3) Reset profile_views for this user so new package starts fresh
+        try {
+          const { error: delErr } = await supabase
+            .from("profile_views")
+            .delete()
+            .eq("viewer_user_id", userId)
+          if (delErr) {
+            console.error("[PayFast] Profile views reset failed:", delErr)
+          }
+        } catch (resetErr) {
+          console.error("[PayFast] Profile views reset threw:", resetErr)
         }
       } else {
         paymentReason = payError.message

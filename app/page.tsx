@@ -1031,7 +1031,40 @@ export default function HomePage() {
             <p className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '0.2s'}}>Pakistan's most trusted matrimonial platform with cutting-edge features</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Mobile-only Carousel for Features */}
+          <div className="md:hidden">
+            <Carousel opts={{ align: 'start', loop: false }}>
+              <CarouselContent>
+                {features.map((feature, index) => (
+                  <CarouselItem key={index} className="basis-[85%]">
+                    <Card 
+                      className="text-center group hover:shadow-2xl transition-all duration-500 border-0 bg-white/80 backdrop-blur-sm hover:bg-white hover:transform hover:scale-105 animate-fade-in-up overflow-hidden relative"
+                      style={{animationDelay: `${0.4 + index * 0.15}s`}}
+                    >
+                      {/* Card Glow Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-humsafar-100/20 to-humsafar-200/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      <CardContent className="p-8 relative z-10">
+                        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-humsafar-100 to-humsafar-200 rounded-2xl mb-6 group-hover:from-humsafar-200 group-hover:to-humsafar-300 transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
+                          <feature.icon className="h-10 w-10 text-humsafar-600 group-hover:text-humsafar-700 transition-colors duration-300" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-humsafar-700 transition-colors duration-300">{feature.title}</h3>
+                        <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">{feature.description}</p>
+                        
+                        {/* Hover Arrow */}
+                        <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                          <div className="w-8 h-0.5 bg-humsafar-400 mx-auto rounded-full"></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          </div>
+
+          {/* Desktop/tablet Grid for Features */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <Card 
                 key={index} 
@@ -1085,7 +1118,67 @@ export default function HomePage() {
             <p className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '0.2s'}}>Real couples, real love stories that inspire millions</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Mobile-only Carousel for Success Stories */}
+          <div className="md:hidden">
+            <Carousel opts={{ align: 'start', loop: false }}>
+              <CarouselContent>
+                {successStories.map((story, index) => (
+                  <CarouselItem key={story.id} className="basis-[85%]">
+                    <Card 
+                      className="overflow-hidden group hover:shadow-2xl transition-all duration-500 border-0 bg-white/90 backdrop-blur-sm hover:transform hover:scale-105 animate-fade-in-up relative"
+                      style={{animationDelay: `${0.4 + index * 0.2}s`}}
+                    >
+                      {/* Card Shimmer Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                      
+                      <div className="aspect-video bg-gradient-to-br from-humsafar-100 to-humsafar-200 relative overflow-hidden">
+                        <Image
+                          src={story.image || "/placeholder.svg"}
+                          alt={story.names}
+                          width={400}
+                          height={225}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        {/* Image Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                      
+                      <CardContent className="p-8 relative">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-humsafar-700 transition-colors duration-300">{story.names}</h3>
+                          <Badge 
+                            variant="outline" 
+                            className="text-humsafar-600 border-humsafar-600 bg-humsafar-50 group-hover:bg-humsafar-100 group-hover:border-humsafar-700 transition-all duration-300"
+                          >
+                            {story.location}
+                          </Badge>
+                        </div>
+                        
+                        <div className="relative mb-6">
+                          <div className="absolute -left-2 -top-2 text-humsafar-300 text-4xl font-serif">"</div>
+                          <p className="text-gray-600 italic leading-relaxed pl-6 group-hover:text-gray-700 transition-colors duration-300">
+                            {story.story}
+                          </p>
+                          <div className="absolute -right-2 -bottom-2 text-humsafar-300 text-4xl font-serif rotate-180">"</div>
+                        </div>
+                        
+                        <div className="flex items-center text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-300">
+                          <Calendar className="h-4 w-4 mr-2 text-humsafar-500" />
+                          {story.date}
+                        </div>
+                        
+                        {/* Bottom Accent Line */}
+                        <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-humsafar-400 to-humsafar-600 group-hover:w-full transition-all duration-500 ease-out"></div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          </div>
+
+          {/* Desktop/tablet Grid for Success Stories */}
+          <div className="hidden md:grid md:grid-cols-3 gap-8">
             {successStories.map((story, index) => (
               <Card 
                 key={story.id} 

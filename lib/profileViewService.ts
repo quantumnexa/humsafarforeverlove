@@ -82,7 +82,7 @@ export class ProfileViewService {
         // Error recording profile view
         return {
           success: false,
-          message: 'Failed to record profile view'
+          message: `Failed to record profile view: ${error.message || 'Unknown error'}`
         };
       }
 
@@ -168,10 +168,10 @@ export class ProfileViewService {
         // If payment is accepted, continue to check user_subscriptions
       }
 
-      // Get user's subscription info
+      // Get user's subscription info (only request existing columns)
       const { data: subscriptionData, error: subError } = await supabase
         .from('user_subscriptions')
-        .select('views_limit, payment_status')
+        .select('views_limit')
         .eq('user_id', targetUserId)
         .single();
 
@@ -185,15 +185,7 @@ export class ProfileViewService {
         };
       }
 
-      // Check if payment is pending approval
-      if (subscriptionData.payment_status === 'pending') {
-        return {
-          success: false,
-          canView: false,
-          remainingViews: subscriptionData.views_limit || 0,
-          message: 'Payment approval required to view profiles.'
-        };
-      }
+      // Payment pending/under_review/rejected are already blocked via payments table above
 
       // Get user's total views count
       const { count: totalViews, error: viewsError } = await supabase
@@ -207,7 +199,7 @@ export class ProfileViewService {
           success: false,
           canView: false,
           remainingViews: 0,
-          message: 'Failed to count views'
+          message: `Failed to count views: ${viewsError.message || 'Unknown error'}`
         };
       }
 
@@ -266,7 +258,7 @@ export class ProfileViewService {
       // Get user subscription info
       const { data: subscription, error: subError } = await supabase
         .from('user_subscriptions')
-        .select('subscription_status, views_limit, payment_status')
+        .select('subscription_status, views_limit')
         .eq('user_id', targetUserId)
         .single();
 
@@ -317,7 +309,7 @@ export class ProfileViewService {
         // Error counting profile views
         return {
           success: false,
-          message: 'Failed to count profile views'
+          message: `Failed to count profile views: ${viewsError.message || 'Unknown error'}`
         };
       }
 
@@ -325,12 +317,18 @@ export class ProfileViewService {
       const currentViews = totalViews || 0;
       const remainingViews = Math.max(0, viewsLimit - currentViews);
 
-      // Add payment status info to subscription status display
+      // Add payment review info to subscription status display (if available)
       let displayStatus = subscription.subscription_status;
-      if (subscription.payment_status === 'pending') {
-        displayStatus += ' (Payment Pending)';
-      } else if (subscription.payment_status === 'approved') {
-        displayStatus += ' (Active)';
+      if (paymentReview && !reviewError) {
+        if (paymentReview.payment_status === 'pending') {
+          displayStatus += ' (Payment Pending)';
+        } else if (paymentReview.payment_status === 'under_review') {
+          displayStatus += ' (Under Review)';
+        } else if (paymentReview.payment_status === 'accepted') {
+          displayStatus += ' (Active)';
+        } else if (paymentReview.payment_status === 'rejected') {
+          displayStatus += ' (Payment Rejected)';
+        }
       }
 
       return {
